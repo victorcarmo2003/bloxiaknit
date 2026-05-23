@@ -1,0 +1,38 @@
+{
+  "id": "bloxia.example.feature",
+  "name": "Example Feature",
+  "version": "0.1.0",
+  "libraryType": "FeaturePack",
+  "summary": "Describe what this feature adds.",
+  "tags": [
+    "example"
+  ],
+  "dependencies": {
+    "wally": [
+      "Lync"
+    ],
+    "bloxia": [],
+    "robloxServices": []
+  },
+  "compatibility": {
+    "bloxiaRuntime": ">=0.1.0",
+    "requiresLync": true,
+    "requiresProfileStoreMigration": false
+  },
+  "publicApi": {
+    "server": [],
+    "client": [],
+    "net": [],
+    "ecs": []
+  },
+  "config": {},
+  "files": [],
+  "install": {
+    "registerNetSchemas": [],
+    "registerEcsComponents": [],
+    "requiresUserConfig": false,
+    "postInstall": [
+      "bloxia validate"
+    ]
+  }
+}

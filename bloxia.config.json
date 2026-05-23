@@ -1,0 +1,34 @@
+{
+  "runtimeVersion": "0.1.0",
+  "projectName": "BLOXIAFramework",
+  "framework": {
+    "backend": "Bloxia",
+    "publicApi": "Bloxia.Framework"
+  },
+  "network": {
+    "stats": true,
+    "globalRateLimit": 120
+  },
+  "profileStore": {
+    "mockInStudio": true,
+    "storeName": "BLOXIA_PlayerData_v1"
+  },
+  "cloudRegistry": {
+    "provider": "supabase",
+    "urlEnv": "BLOXIA_SUPABASE_URL",
+    "anonKeyEnv": "BLOXIA_SUPABASE_ANON_KEY"
+  },
+  "paths": {
+    "services": "src/server/Services",
+    "controllers": "src/client/Controllers",
+    "serverComponents": "src/server/Components",
+    "clientComponents": "src/client/Components",
+    "serverSystems": "src/server/Systems",
+    "clientSystems": "src/client/Systems",
+    "ecsComponents": "src/shared/Bloxia/ECS/Components",
+    "netSchemas": "src/shared/Bloxia/Net/Schemas",
+    "ui": "src/client/UI",
+    "data": "src/server/Data",
+    "sharedFeatures": "src/shared/Bloxia/Features"
+  }
+}

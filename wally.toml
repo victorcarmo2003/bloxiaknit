@@ -1,0 +1,14 @@
+[package]
+name = "hakor/bloxiaframework"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
+QuickZone = "ldgerrits/quickzone@1.4.6"
+Lync = "axp3cter/lync@2.3.3"
+Fusion = "realdeedy/fusion@0.3.0"
+jecs = "ukendio/jecs@0.11.0"
+
+[server-dependencies]
+ProfileStore = "ddashdev/profilestore@1.0.4"

@@ -1,0 +1,21 @@
+# Project place files
+/*.rbxlx
+/*.rbxl
+
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+
+sourcemap.json
+
+# Wally generated packages
+/Packages
+/ServerPackages
+
+# Local environment
+.env
+.env.*
+
+# BLOXIA generated temp/cache output
+/.bloxia/cache
+/.bloxia/tmp

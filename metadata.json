@@ -1,0 +1,268 @@
+{
+  "project": {
+    "name": "BLOXIAFramework",
+    "purpose": "Foundation library for BLOXIA, a Roblox game-development IDE workflow that guides AI-generated code toward modular Bloxia services/controllers/components/systems, Jecs simulation and optimized Lync networking.",
+    "status": "template-foundation"
+  },
+  "architecture": {
+    "shared": {
+      "path": "src/shared/Bloxia",
+      "role": "Public library surface shared by server and client.",
+      "entrypoint": "src/shared/Bloxia/init.luau"
+    },
+    "framework": {
+      "path": "src/shared/Bloxia/Framework",
+      "role": "BLOXIA-owned lifecycle, module registration, component binding, system loops and dependency facade.",
+      "rule": "Gameplay modules should use Bloxia.Service, Bloxia.Controller, Bloxia.Component and Bloxia.System. Knit is not part of the runtime."
+    },
+    "ecs": {
+      "path": "src/shared/Bloxia/ECS",
+      "role": "Jecs facade, world registry and ordered ECS component ID registry.",
+      "rule": "Use Bloxia.ECS from systems. Declare ECS component IDs under src/shared/Bloxia/ECS/Components and register them in ECS/Registry.luau."
+    },
+    "network": {
+      "path": "src/shared/Bloxia/Net",
+      "role": "Single source of truth for Lync packets, queries, groups and codecs.",
+      "rule": "Every Lync packet, query and group must be defined before Bloxia.Net.start(). Do not define network contracts inside services/controllers."
+    },
+    "server": {
+      "path": "src/server",
+      "role": "Bloxia service layer. Services own gameplay, persistence and server authority."
+    },
+    "client": {
+      "path": "src/client",
+      "role": "Bloxia controller layer. Controllers own local input, presentation and UI orchestration."
+    },
+    "metadata": {
+      "strategy": "Use this root metadata.json as the primary AI-readable manifest. Add module-level metadata only for large or ambiguous subsystems.",
+      "reason": "Per-file meta files create maintenance noise and may interfere with Rojo-synced paths if placed inside src."
+    },
+    "libraryRegistry": {
+      "path": ".bloxia/marketplace.md",
+      "role": "Defines how BLOXIA searches, selects and installs reusable pluggable libraries from a cloud registry."
+    },
+    "cli": {
+      "path": "tools/bloxia.ps1",
+      "role": "Local validation and module generation shortcuts for the BLOXIA IDE and developers."
+    },
+    "config": {
+      "path": "bloxia.config.json",
+      "role": "Machine-readable project configuration for paths, registry settings and template defaults."
+    }
+  },
+  "cloudRegistry": {
+    "providerTarget": "Supabase",
+    "purpose": "Store reviewed pluggable BLOXIA libraries so the IDE can reuse existing systems before generating new code.",
+    "lookupFlow": [
+      "Parse user request into feature intent.",
+      "Search remote libraries by tags, summary and public API.",
+      "Filter candidates by runtime compatibility, dependencies and public API fit.",
+      "Ask the user to choose when multiple candidates match or configuration is required.",
+      "Install selected files into BLOXIA folders and register NetSchemas before network start.",
+      "Validate Rojo metadata, JSON and project conventions after install."
+    ],
+    "recommendedTables": [
+      "libraries",
+      "library_versions",
+      "library_dependencies",
+      "library_public_api",
+      "library_artifacts",
+      "library_reviews",
+      "install_events"
+    ],
+    "compatibilityRules": [
+      "Reject gameplay remotes outside Lync NetSchemas.",
+      "Reject any direct Knit usage.",
+      "Reject components outside src/server/Components or src/client/Components.",
+      "Reject systems outside src/server/Systems or src/client/Systems.",
+      "Reject ECS component IDs outside src/shared/Bloxia/ECS/Components.",
+      "Reject client-owned server authority.",
+      "Require confirmation for ProfileStore data migrations.",
+      "Require compatible BLOXIA runtime and dependency versions.",
+      "Prefer reviewed immutable version artifacts."
+    ]
+  },
+  "dependencies": {
+    "Lync": {
+      "realm": "shared",
+      "role": "Authoritative networking layer using codecs, packets, queries, groups and buffer serialization."
+    },
+    "QuickZone": {
+      "realm": "shared",
+      "role": "Spatial query and zone tracking subsystem."
+    },
+    "Fusion": {
+      "realm": "client",
+      "role": "Reactive UI construction on the client."
+    },
+    "jecs": {
+      "realm": "shared",
+      "role": "Data-oriented entity-component-system simulation used through Bloxia.ECS and Bloxia.System."
+    },
+    "ProfileStore": {
+      "realm": "server",
+      "role": "Player persistence and session locking. PlayerDataService uses Mock in Studio by default."
+    }
+  },
+  "aiInstructions": {
+    "instructionFiles": [
+      ".bloxia/instructions.md",
+      ".bloxia/framework.md",
+      ".bloxia/marketplace.md"
+    ],
+    "decisionMap": {
+      "Service": "Server authority, public feature APIs, persistence, economy and anti-cheat.",
+      "Controller": "Client input, camera, UI orchestration, prediction and presentation.",
+      "Component": "Behavior attached to tagged Roblox instances.",
+      "System": "Jecs simulation over many entities or data rows.",
+      "NetSchema": "Client/server communication contracts.",
+      "Utility": "Stateless reusable helpers without lifecycle."
+    },
+    "dependencyRules": [
+      "Services may depend only on server Services.",
+      "Controllers may depend only on client Controllers.",
+      "Server Components and Systems may depend only on server Services.",
+      "Client Components and Systems may depend only on client Controllers.",
+      "Use Bloxia.Net instead of DependsOn for server/client communication."
+    ],
+    "allowedModuleTypes": [
+      "Service",
+      "Controller",
+      "Component",
+      "System",
+      "ECSComponent",
+      "NetSchema",
+      "UIComponent",
+      "DataModule",
+      "Utility"
+    ],
+    "rules": [
+      "Use the decisionMap before creating any file.",
+      "Create server gameplay as Bloxia services under src/server/Services.",
+      "Create client behavior as Bloxia controllers under src/client/Controllers.",
+      "Create tag-based instance behavior as Bloxia components under src/server/Components or src/client/Components.",
+      "Create data-oriented simulation as Bloxia systems under src/server/Systems or src/client/Systems.",
+      "Create ECS component IDs under src/shared/Bloxia/ECS/Components and register them in src/shared/Bloxia/ECS/Registry.luau.",
+      "Create UI through Fusion modules under src/client/UI.",
+      "Create persistence through server-only modules and PlayerDataService.",
+      "Create all networking contracts under src/shared/Bloxia/Net/Schemas and register them in Registry.luau.",
+      "Never create ad hoc RemoteEvent or RemoteFunction instances for gameplay features.",
+      "Never import Knit.",
+      "Never require Packages.jecs directly from feature code; use Bloxia.ECS.",
+      "Never define Lync packets/queries/groups after Bloxia.Net.start().",
+      "Never create gameplay networking inside services, controllers, components or systems.",
+      "Prefer explicit Lync codecs over Lync.auto for production gameplay payloads.",
+      "Use Lync groups for audience targeting instead of sending repeated individual packets when possible.",
+      "Keep Services authoritative. Controllers should request, display or predict, not own server truth."
+    ],
+    "validationCommand": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/bloxia.ps1 validate"
+  },
+  "modules": {
+    "tools/bloxia.ps1": {
+      "type": "CLI",
+      "commands": [
+        "validate",
+        "make service",
+        "make controller",
+        "make net",
+        "make ecs",
+        "make component",
+        "make system",
+        "make ui",
+        "make data",
+        "cloud search",
+        "cloud install --dry-run"
+      ]
+    },
+    "bloxia.config.json": {
+      "type": "ProjectConfig",
+      "instruction": "Used by BLOXIA tooling and IDE integrations. Roblox runtime code does not read this file directly."
+    },
+    ".bloxia/templates": {
+      "type": "CodeTemplates",
+      "instruction": "Agents should prefer these templates when creating new Services, Controllers, Components, NetSchemas, UI components or data modules."
+    },
+    "src/shared/Bloxia/init.luau": {
+      "type": "LibraryEntrypoint",
+      "exports": [
+        "Net",
+        "ECS",
+        "Framework",
+        "Service",
+        "Controller",
+        "Component",
+        "System"
+      ]
+    },
+    "src/shared/Bloxia/Framework/init.luau": {
+      "type": "FrameworkEntrypoint",
+      "instruction": "Public lifecycle API for Bloxia services, controllers and components. This is a native BLOXIA runtime."
+    },
+    "src/shared/Bloxia/ECS/init.luau": {
+      "type": "ECSFacade",
+      "exports": [
+        "raw",
+        "world",
+        "components",
+        "component",
+        "tag"
+      ]
+    },
+    "src/shared/Bloxia/ECS/Registry.luau": {
+      "type": "ECSRegistry",
+      "instruction": "Add new ECS component modules to orderedComponents in stable order. Changing order changes Jecs component IDs."
+    },
+    "src/shared/Bloxia/Net/init.luau": {
+      "type": "NetworkFacade",
+      "exports": [
+        "configure",
+        "defineAll",
+        "get",
+        "start",
+        "raw"
+      ]
+    },
+    "src/shared/Bloxia/Net/Registry.luau": {
+      "type": "NetRegistry",
+      "instruction": "Add new schema modules to orderedSchemas in stable order. Changing order changes Lync IDs."
+    },
+    "src/shared/Bloxia/Net/Schemas/PlayerNet.luau": {
+      "type": "NetSchema",
+      "instruction": "Owns player data packets and queries. Keep payloads small and explicit."
+    },
+    "src/shared/Bloxia/Net/Schemas/ZoneNet.luau": {
+      "type": "NetSchema",
+      "instruction": "Owns zone packets and Lync groups. New zone groups must be defined here before network start."
+    },
+    "src/server/Services/PlayerDataService.luau": {
+      "type": "Service",
+      "dependencies": [
+        "Bloxia.Framework",
+        "ProfileStore",
+        "Bloxia.Net"
+      ]
+    },
+    "src/server/Services/ZoneService.luau": {
+      "type": "Service",
+      "dependencies": [
+        "Bloxia.Framework",
+        "QuickZone",
+        "Bloxia.Net"
+      ]
+    },
+    "src/client/Controllers/PlayerController.luau": {
+      "type": "Controller",
+      "dependencies": [
+        "Bloxia.Framework",
+        "Bloxia.Net"
+      ]
+    },
+    "src/client/Controllers/UIController.luau": {
+      "type": "Controller",
+      "dependencies": [
+        "Bloxia.Framework",
+        "Fusion"
+      ]
+    }
+  }
+}

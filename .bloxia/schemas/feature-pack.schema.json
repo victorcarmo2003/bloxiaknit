@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bloxia.local/schemas/feature-pack.schema.json",
+  "title": "BLOXIA Feature Pack Manifest",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "version",
+    "libraryType",
+    "summary",
+    "publicApi",
+    "files"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([._-][a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "libraryType": {
+      "type": "string",
+      "enum": [
+        "Service",
+        "Controller",
+        "Component",
+        "System",
+        "ECSComponent",
+        "NetSchema",
+        "UIComponent",
+        "DataModule",
+        "SharedUtility",
+        "AssetBundle",
+        "FeaturePack"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "properties": {
+        "wally": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bloxia": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "robloxServices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "properties": {
+        "bloxiaRuntime": {
+          "type": "string"
+        },
+        "requiresLync": {
+          "type": "boolean"
+        },
+        "requiresProfileStoreMigration": {
+          "type": "boolean"
+        }
+      }
+    },
+    "publicApi": {
+      "type": "object"
+    },
+    "config": {
+      "type": "object"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "kind"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "Service",
+              "Controller",
+              "Component",
+              "System",
+              "ECSComponent",
+              "NetSchema",
+              "UIComponent",
+              "DataModule",
+              "SharedUtility",
+              "Asset"
+            ]
+          },
+          "checksum": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "install": {
+      "type": "object",
+      "properties": {
+        "registerNetSchemas": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "registerEcsComponents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "requiresUserConfig": {
+          "type": "boolean"
+        },
+        "postInstall": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
