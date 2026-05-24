@@ -95,6 +95,49 @@ local function makePromise(executor: () -> any): any
 	return makeResolvedPromise(ok, result)
 end
 
+local function awaitMaybe(value: any): any
+	if type(value) ~= "table" then
+		return value
+	end
+
+	if type(value.await) == "function" then
+		local ok, result = value:await()
+		if not ok then
+			error(result, 3)
+		end
+		return result
+	end
+
+	if type(value.andThen) == "function" then
+		local done = false
+		local ok = true
+		local result = nil
+
+		value
+			:andThen(function(resolved)
+				result = resolved
+				done = true
+			end)
+			:catch(function(err)
+				ok = false
+				result = err
+				done = true
+			end)
+
+		while not done do
+			task.wait()
+		end
+
+		if not ok then
+			error(result, 3)
+		end
+
+		return result
+	end
+
+	return value
+end
+
 local function getRegistry(kind: string): { [string]: any }
 	if kind == "Service" then
 		return services
@@ -207,7 +250,7 @@ local function resolveDependencies(module: ModuleDef, stack: { [string]: boolean
 	injectRuntime(module)
 
 	if module.Init ~= nil then
-		module:Init()
+		awaitMaybe(module:Init())
 	end
 
 	module._bloxiaInitDone = true
@@ -244,7 +287,7 @@ local function startRegistry(registry: { [string]: any }): ()
 			end
 
 			if target.Start ~= nil then
-				target:Start()
+				awaitMaybe(target:Start())
 			end
 
 			target._bloxiaStarted = true

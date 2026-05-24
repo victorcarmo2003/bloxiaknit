@@ -164,17 +164,54 @@ function Test-JsonFile($RelativePath) {
 	}
 }
 
+function Resolve-RojoCommand {
+	$envPath = [Environment]::GetEnvironmentVariable("BLOXIA_ROJO_PATH")
+	if (-not [string]::IsNullOrWhiteSpace($envPath) -and (Test-Path -LiteralPath $envPath)) {
+		return $envPath
+	}
+
+	$homeDir = [Environment]::GetEnvironmentVariable("USERPROFILE")
+	if ([string]::IsNullOrWhiteSpace($homeDir)) {
+		$homeDir = [Environment]::GetFolderPath("UserProfile")
+	}
+	$candidates = @(
+		(Join-Path $homeDir ".rokit\tool-storage\rojo-rbx\rojo\7.7.0-rc.1\rojo.exe"),
+		(Join-Path $homeDir ".rokit\tool-storage\rojo-rbx\rojo\7.6.1\rojo.exe"),
+		(Join-Path $homeDir ".aftman\bin\rojo.exe")
+	)
+
+	foreach ($candidate in $candidates) {
+		if (Test-Path -LiteralPath $candidate) {
+			return $candidate
+		}
+	}
+
+	$cmd = Get-Command rojo -ErrorAction SilentlyContinue
+	if ($null -ne $cmd) {
+		try {
+			$output = & $cmd.Source --version 2>$null
+			if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($output)) {
+				return $cmd.Source
+			}
+		} catch {
+			# Some Rokit shims can exist but fail to resolve the real tool.
+		}
+	}
+
+	return $null
+}
+
 function Test-RojoProject {
-	$rojo = Get-Command rojo -ErrorAction SilentlyContinue
+	$rojo = Resolve-RojoCommand
 
 	if ($null -eq $rojo) {
-		Add-ValidationWarning "rojo is not available on PATH; skipped sourcemap validation"
+		Add-ValidationWarning "rojo is not available; skipped sourcemap validation"
 		return
 	}
 
 	Push-Location $ProjectRoot
 	try {
-		& rojo sourcemap default.project.json | Out-Null
+		& $rojo sourcemap default.project.json | Out-Null
 
 		if ($LASTEXITCODE -eq 0) {
 			Write-Good "Rojo sourcemap validates"
