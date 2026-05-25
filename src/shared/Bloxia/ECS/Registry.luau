@@ -1,19 +1,11 @@
 --!strict
-
-local orderedComponents = {
-	-- Add ECS component modules here in stable order.
-}
+-- BLOXIA ECS Component Registry
 
 local Registry = {}
 
-function Registry.define(ECS: any, worldName: string): any
-	local components = ECS.components(worldName)
+Registry.orderedComponents = {
+	require(script.Parent.Components.TowerComponents),
+	require(script.Parent.Components.EnemyComponents),
+}
 
-	for _, defineComponent in orderedComponents do
-		defineComponent(ECS, worldName, components)
-	end
-
-	return components
-end
-
-return Registry
+return table.freeze(Registry)

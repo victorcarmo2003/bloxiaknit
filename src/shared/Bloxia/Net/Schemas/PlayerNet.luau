@@ -1,35 +1,13 @@
 --!strict
+-- PlayerNet: Player-specific network contracts
 
-local PlayerNet = {
-	name = "Player",
-}
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Lync = require(ReplicatedStorage.Packages.Lync)
 
-local function createSummaryCodec(Lync: any): any
-	return Lync.struct({
-		level = Lync.int(0, 1000),
-		xp = Lync.int(0, 100000000),
-		coins = Lync.int(0, 100000000),
-	})
-end
+local PlayerNet = {}
 
-function PlayerNet.define(Lync: any): any
-	local summaryCodec = createSummaryCodec(Lync)
+PlayerNet.PlayerData = Lync.query("PlayerData", Lync.auto, Lync.auto)
 
-	return table.freeze({
-		DataReady = Lync.packet("Player.DataReady", summaryCodec),
-		GetDataSummary = Lync.query("Player.GetDataSummary", Lync.nothing, summaryCodec, {
-			timeout = 5,
-			rateLimit = {
-				maxPerSecond = 2,
-			},
-		}),
-		Ping = Lync.query("Player.Ping", Lync.nothing, Lync.f64, {
-			timeout = 3,
-			rateLimit = {
-				maxPerSecond = 5,
-			},
-		}),
-	})
-end
+PlayerNet.PlayerJoined = Lync.packet("PlayerJoined", Lync.nothing, { unreliable = false })
 
 return table.freeze(PlayerNet)

@@ -1,19 +1,22 @@
 --!strict
+-- ZoneNet: ZoneService network contracts
 
-local ZoneNet = {
-	name = "Zone",
-}
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Lync = require(ReplicatedStorage.Packages.Lync)
 
-function ZoneNet.define(Lync: any): any
-	return table.freeze({
-		ActivePlayers = Lync.group("Zone.ActivePlayers"),
-		PlayerZoneChanged = Lync.packet("Zone.PlayerZoneChanged", Lync.struct({
-			zoneId = Lync.string(64),
-			inside = Lync.bool,
-		}), {
-			timestamp = "frame",
-		}),
-	})
-end
+local ZoneNet = {}
+
+ZoneNet.PlayerZoneChanged = Lync.packet("PlayerZoneChanged", Lync.struct({
+	zoneId = Lync.string,
+	inside = Lync.bool,
+}), { unreliable = true })
+
+ZoneNet.ZoneEntered = Lync.packet("ZoneEntered", Lync.struct({
+	zoneId = Lync.string,
+}), { unreliable = true })
+
+ZoneNet.ZoneExited = Lync.packet("ZoneExited", Lync.struct({
+	zoneId = Lync.string,
+}), { unreliable = true })
 
 return table.freeze(ZoneNet)

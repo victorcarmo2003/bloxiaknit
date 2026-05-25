@@ -1,20 +1,13 @@
 --!strict
-
-local orderedSchemas = {
-	require(script.Parent.Schemas.PlayerNet),
-	require(script.Parent.Schemas.ZoneNet),
-}
+-- BLOXIA Net Schema Registry
+-- All schemas are loaded automatically by the framework.
 
 local Registry = {}
 
-function Registry.define(Lync: any): any
-	local net = {}
-
-	for _, schema in orderedSchemas do
-		net[schema.name] = schema.define(Lync)
-	end
-
-	return table.freeze(net)
-end
+Registry.orderedSchemas = {
+	require(script.Parent.Schemas.PlayerNet),
+	require(script.Parent.Schemas.ZoneNet),
+	require(script.Parent.Schemas.TDNet),
+}
 
 return table.freeze(Registry)
